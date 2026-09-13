@@ -1,0 +1,204 @@
+[
+  {
+    "op": "create",
+    "as": "book",
+    "module": "bookEntries",
+    "data": {
+      "sourceId": "ERP-001",
+      "bookedAt": "$today",
+      "direction": "IN",
+      "amount": 100,
+      "reference": "INV-001",
+      "counterparty": "华东客户"
+    }
+  },
+  {
+    "op": "create",
+    "as": "bank",
+    "module": "bankEntries",
+    "data": {
+      "sourceId": "BNK-001",
+      "account": "账户A",
+      "bookedAt": "$today",
+      "direction": "IN",
+      "amount": 100,
+      "reference": "INV-001",
+      "counterparty": "华东客户"
+    }
+  },
+  {
+    "op": "action",
+    "target": "bank",
+    "action": "propose",
+    "data": {}
+  },
+  {
+    "op": "check",
+    "target": "bank",
+    "expect": {
+      "state": "PROPOSED",
+      "data.matchScore": 100
+    }
+  },
+  {
+    "op": "check",
+    "target": "book",
+    "expect": {
+      "state": "OPEN"
+    }
+  },
+  {
+    "op": "action",
+    "target": "bank",
+    "action": "confirm",
+    "data": {},
+    "error": 403
+  },
+  {
+    "op": "action",
+    "target": "bank",
+    "action": "confirm",
+    "data": {},
+    "role": "reviewer"
+  },
+  {
+    "op": "check",
+    "target": "bank",
+    "expect": {
+      "state": "MATCHED"
+    }
+  },
+  {
+    "op": "check",
+    "target": "book",
+    "expect": {
+      "state": "MATCHED",
+      "data.matchedBank": "$bank.id"
+    }
+  },
+  {
+    "op": "find",
+    "as": "match",
+    "module": "matches",
+    "where": {
+      "data.bank": "$bank.id"
+    }
+  },
+  {
+    "op": "metric",
+    "expect": {
+      "待复核候选": 0,
+      "已确认匹配": 1
+    }
+  },
+  {
+    "op": "create",
+    "as": "duplicateBank",
+    "module": "bankEntries",
+    "data": {
+      "sourceId": "BNK-001",
+      "account": "账户A",
+      "bookedAt": "$today",
+      "direction": "IN",
+      "amount": 100,
+      "reference": "INV-001",
+      "counterparty": "华东客户"
+    },
+    "error": 409
+  },
+  {
+    "op": "create",
+    "as": "book2",
+    "module": "bookEntries",
+    "data": {
+      "sourceId": "ERP-002",
+      "bookedAt": "$today",
+      "direction": "OUT",
+      "amount": 50,
+      "reference": "PAY-002",
+      "counterparty": "供应商甲"
+    }
+  },
+  {
+    "op": "create",
+    "as": "book3",
+    "module": "bookEntries",
+    "data": {
+      "sourceId": "ERP-003",
+      "bookedAt": "$today",
+      "direction": "OUT",
+      "amount": 50,
+      "reference": "PAY-002",
+      "counterparty": "供应商甲"
+    }
+  },
+  {
+    "op": "create",
+    "as": "bank2",
+    "module": "bankEntries",
+    "data": {
+      "sourceId": "BNK-002",
+      "account": "账户A",
+      "bookedAt": "$today",
+      "direction": "OUT",
+      "amount": 50,
+      "reference": "PAY-002",
+      "counterparty": "供应商甲"
+    }
+  },
+  {
+    "op": "action",
+    "target": "bank2",
+    "action": "propose",
+    "data": {},
+    "error": 409
+  },
+  {
+    "op": "action",
+    "target": "bank2",
+    "action": "exception",
+    "data": {
+      "reason": "两个同分候选，等待人工核验"
+    }
+  },
+  {
+    "op": "check",
+    "target": "bank2",
+    "expect": {
+      "state": "EXCEPTION"
+    }
+  },
+  {
+    "op": "action",
+    "target": "bank2",
+    "action": "close",
+    "data": {
+      "resolution": "确认需走人工差异流程"
+    },
+    "role": "reviewer"
+  },
+  {
+    "op": "check",
+    "target": "bank2",
+    "expect": {
+      "state": "CLOSED"
+    }
+  },
+  {
+    "op": "count",
+    "module": "proposals",
+    "count": 1
+  },
+  {
+    "op": "count",
+    "module": "matches",
+    "count": 1
+  },
+  {
+    "op": "metric",
+    "expect": {
+      "已确认匹配": 1,
+      "待处理差异": 0
+    }
+  }
+]
