@@ -1,0 +1,42 @@
+[
+  {
+    "op": "create",
+    "as": "book",
+    "module": "bookEntries",
+    "data": {
+      "sourceId": "DEMO-ERP-01",
+      "bookedAt": "$today",
+      "direction": "IN",
+      "amount": 100,
+      "reference": "DEMO-INV-01",
+      "counterparty": "演示客户"
+    }
+  },
+  {
+    "op": "create",
+    "as": "bank",
+    "module": "bankEntries",
+    "data": {
+      "sourceId": "DEMO-BNK-01",
+      "account": "演示账户",
+      "bookedAt": "$today",
+      "direction": "IN",
+      "amount": 100,
+      "reference": "DEMO-INV-01",
+      "counterparty": "演示客户"
+    }
+  },
+  {
+    "op": "action",
+    "target": "bank",
+    "action": "propose",
+    "data": {}
+  },
+  {
+    "op": "action",
+    "target": "bank",
+    "action": "confirm",
+    "data": {},
+    "role": "reviewer"
+  }
+]
