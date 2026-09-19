@@ -6,12 +6,28 @@ import java.time.*;
 import static cn.zhuatech.reconcileai.Model.*;
 import static cn.zhuatech.reconcileai.Engine.*;
 
-/** 银企候选匹配接口；默认规则只提出候选，最终入账需独立复核。 */
+/**
+ * 银企候选匹配接口；默认规则只提出候选，最终入账需独立复核。
+ *
+ * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+ */
 public interface InsightProvider {
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  record Candidate(String bookId,int score,List<String> evidence){}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  List<Candidate> candidates(Row bank,List<Row> books);
 }
+/**
+ * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+ */
 @Component class LocalInsightProvider implements InsightProvider {
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public List<Candidate> candidates(Row bank,List<Row> books){
   List<Candidate> results=new ArrayList<>();
   for(Row book:books){

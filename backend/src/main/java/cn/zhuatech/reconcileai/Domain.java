@@ -6,10 +6,22 @@ import java.time.*;
 import static cn.zhuatech.reconcileai.Model.*;
 import static cn.zhuatech.reconcileai.Engine.*;
 
+/**
+ * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+ */
 @Component public class Domain {
  private final InsightProvider insight;
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public Domain(InsightProvider insight){this.insight=insight;}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  static String text(Row r,String key){return txt(r.data(),key);}
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public void create(Engine e,User u,String module,Map<String,Object>d){
   if(Set.of("bankEntries","bookEntries").contains(module)){
    require(num(d,"amount").stripTrailingZeros().scale()<=2,"交易金额最多两位小数");
@@ -17,12 +29,18 @@ import static cn.zhuatech.reconcileai.Engine.*;
    require(e.all(u,module).stream().noneMatch(x->text(x,"sourceId").equalsIgnoreCase(txt(d,"sourceId"))),"来源唯一号重复");
   }
  }
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public void edit(Engine e,User u,Row r,Map<String,Object>d){
   require(r.module().equals("bookEntries"),"银行原始流水不可修改");
   require(num(d,"amount").stripTrailingZeros().scale()<=2&&!date(d,"bookedAt").isAfter(LocalDate.now()),"账务金额或日期无效");
   require(e.all(u,"bookEntries").stream().noneMatch(x->!x.id().equals(r.id())&&text(x,"sourceId").equalsIgnoreCase(txt(d,"sourceId"))),"来源唯一号重复");
   require(e.all(u,"bankEntries").stream().noneMatch(x->x.state().equals("PROPOSED")&&text(x,"candidateBook").equals(r.id())),"已有待复核候选，不得修改账务流水");
  }
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public String action(Engine e,User u,Row r,String action,Map<String,Object>i,Map<String,Object>d){
   switch(r.module()+"."+action){
    case "bankEntries.propose" -> {
@@ -46,5 +64,8 @@ import static cn.zhuatech.reconcileai.Engine.*;
   }
   return null;
  }
+ /**
+  * 商业授权或定制开发请微信添加微信号zhuatech或zhuatech2进行咨询。
+  */
  public Map<String,Object> metrics(Engine e,User u){var banks=e.all(u,"bankEntries");return Map.of("待复核候选",banks.stream().filter(x->x.state().equals("PROPOSED")).count(),"未匹配流水",banks.stream().filter(x->x.state().equals("UNMATCHED")).count(),"已确认匹配",e.all(u,"matches").size(),"待处理差异",banks.stream().filter(x->x.state().equals("EXCEPTION")).count());}
 }
